@@ -1,52 +1,54 @@
-#include<iostream>
+#include <iostream>
+#include <queue>
 using namespace std;
 
-class node
+class Node
 {
-    node*left;
-    node*right;
+public:
+    Node* left;
+    Node* right;
     string key;
-    string  value;
-    node(string  k , string v )
+    string value;
+
+    Node(string k, string v)
     {
-        key= k ;
+        key = k;
         value = v;
-        left= nullptr;
+        left = nullptr;
         right = nullptr;
-        
     }
-    
-}
+};
 
-class tree 
+class tree
 {
-    node * root;
-    public:
+    Node* root;
 
+public:
     tree()
     {
         root = nullptr;
     }
-    node insert(node * root , string key, string value)
+
+    Node* insert(Node* root, string k, string value)
     {
-        if (root == nullptr) {
-            return new Node(key);
+        if (root == nullptr)
+        {
+            return new Node(k, value); // Create and return a new node
         }
 
-        
-        if (key < root->value) {
-            root->left = insert(root->left, key ,value );  
-        } else {
-            root->right = insert(root->right, key , value );  
+        if (k < root->key) // Compare with key, not value
+        {
+            root->left = insert(root->left, k, value);
+        }
+        else
+        {
+            root->right = insert(root->right, k, value);
+        }
 
-       
-        return root;
+        return root; // Return root of the modified subtree
     }
 
-
-    }
-
-  Node* deleteNode(Node* root, string key) {
+    Node* deleteNode(Node* root, string key) {
         Node* parent = nullptr;
         Node* current = root;
 
@@ -104,12 +106,101 @@ class tree
             }
 
     }
+    
+Node* search(Node* root, string key)
+{
+    while (root != nullptr) {
+        // If key matches the root node, return it
+        if (root->key == key) {
+            return root;
+        }
+        // Move left or right based on key comparison
+        if (key < root->key) {
+            root = root->left;
+        } else {
+            root = root->right;
+        }
+    }
+    // Return nullptr if the key was not found
+    return nullptr;
+}
 
-    void inorder(Node* root) {
-        if (root != nullptr) {
+ 
+    void inorder(Node* root)
+    {
+        if (root != nullptr)
+        {
             inorder(root->left);
             cout << root->key << ": " << root->value << endl;
             inorder(root->right);
         }
     }
+    void preorder(Node* root)
+    {
+        if (root != nullptr)
+        {
+            cout << root->key << ": " << root->value << endl; // Visit the root node first
+            preorder(root->left);  // Traverse the left subtree
+            preorder(root->right); // Traverse the right subtree
+        }
+    }
+
+    void postorder(Node* root)
+    {
+        if (root != nullptr)
+        {
+            postorder(root->left);  // Traverse the left subtree
+            postorder(root->right); // Traverse the right subtree
+            cout << root->key << ": " << root->value << endl; // Visit the root node last
+        }
+    }
+    void levelOrderTraversal(Node* root) {
+    if (!root) return;
+    queue<Node*> q;
+    q.push(root);
+    while (!q.empty()) {
+        Node* curr = q.front();
+        q.pop();
+        cout << curr->data << " ";
+        if (curr->left) q.push(curr->left);
+        if (curr->right) q.push(curr->right);
+    }
+}
+
+
+    // Utility function to initiate insertion and inorder traversal
+    void insert(string key, string value)
+    {
+        root = insert(root, key, value);
+    }
+
+    void deleteNode(string key)
+    {
+        root = deleteNode(root, key);
+    }
+
+    void displayInorder()
+    {
+        inorder(root);
+    }
+    
+    
+   void copytree(Node* root, tree& copyTree)
+    {
+        if (root == nullptr) return;
+        copyTree.insert(root->key, root->value);
+        copytree(root->left, copyTree);
+        copytree(root->right, copyTree);
+    }
+
+    // Utility function to initiate copying
+    void copytree(tree& copyTree)
+    {
+        copytree(root, copyTree);
+    }
+};
+
+int main()
+{
+    
 }
