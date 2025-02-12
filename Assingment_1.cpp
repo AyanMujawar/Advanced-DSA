@@ -104,28 +104,29 @@ public:
                     parent->right = current->left;
                 }
             }
-
-    }
+        }
     
-Node* search(Node* root, string key)
-{
-    while (root != nullptr) {
-        // If key matches the root node, return it
-        if (root->key == key) {
-            return root;
-        }
-        // Move left or right based on key comparison
-        if (key < root->key) {
-            root = root->left;
-        } else {
-            root = root->right;
-        }
+        return root;
     }
-    // Return nullptr if the key was not found
-    return nullptr;
-}
 
- 
+    Node* search(Node* root, string key)
+    {
+        while (root != nullptr) {
+            // If key matches the root node, return it
+            if (root->key == key) {
+                return root;
+            }
+            // Move left or right based on key comparison
+            if (key < root->key) {
+                root = root->left;
+            } else {
+                root = root->right;
+            }
+        }
+        // Return nullptr if the key was not found
+        return nullptr;
+    }
+
     void inorder(Node* root)
     {
         if (root != nullptr)
@@ -135,6 +136,7 @@ Node* search(Node* root, string key)
             inorder(root->right);
         }
     }
+
     void preorder(Node* root)
     {
         if (root != nullptr)
@@ -154,19 +156,19 @@ Node* search(Node* root, string key)
             cout << root->key << ": " << root->value << endl; // Visit the root node last
         }
     }
-    void levelOrderTraversal(Node* root) {
-    if (!root) return;
-    queue<Node*> q;
-    q.push(root);
-    while (!q.empty()) {
-        Node* curr = q.front();
-        q.pop();
-        cout << curr->data << " ";
-        if (curr->left) q.push(curr->left);
-        if (curr->right) q.push(curr->right);
-    }
-}
 
+    void levelOrderTraversal(Node* root) {
+        if (!root) return;
+        queue<Node*> q;
+        q.push(root);
+        while (!q.empty()) {
+            Node* curr = q.front();
+            q.pop();
+            cout << curr->key << " : " << curr->value << endl;
+            if (curr->left) q.push(curr->left);
+            if (curr->right) q.push(curr->right);
+        }
+    }
 
     // Utility function to initiate insertion and inorder traversal
     void insert(string key, string value)
@@ -179,13 +181,37 @@ Node* search(Node* root, string key)
         root = deleteNode(root, key);
     }
 
+    void searchnode(string key)
+    {
+        Node* found = search(root, key);
+        if (found) {
+            cout << "Found node: " << found->key << " : " << found->value << endl;
+        } else {
+            cout << "Node with key " << key << " not found!" << endl;
+        }
+    }
+
     void displayInorder()
     {
         inorder(root);
     }
-    
-    
-   void copytree(Node* root, tree& copyTree)
+
+    void displayPreorder()
+    {
+        preorder(root);
+    }
+
+    void displayPostorder()
+    {
+        postorder(root);
+    }
+
+    void displayLevelOrder()
+    {
+        levelOrderTraversal(root);
+    }
+
+    void copytree(Node* root, tree& copyTree)
     {
         if (root == nullptr) return;
         copyTree.insert(root->key, root->value);
@@ -202,5 +228,23 @@ Node* search(Node* root, string key)
 
 int main()
 {
-    
+    tree t;
+    t.insert("a", "xyz");
+    t.insert("b", "xyz");
+    t.insert("c", "xyz");
+    t.insert("d", "xyz");
+    t.insert("e", "xyz");
+
+    t.displayInorder();
+    t.displayPreorder();
+    t.displayPostorder();
+    t.displayLevelOrder();
+
+    t.searchnode("c");
+    t.searchnode("f");
+
+    t.deleteNode("c");
+    t.displayInorder();
+
+    return 0;
 }
