@@ -40,86 +40,91 @@ public:
         {
             root->left = insert(root->left, k, value);
         }
-        else
+        else if (k > root->key)
         {
             root->right = insert(root->right, k, value);
+        }
+        else
+        {
+            root->value = value; // Update value if duplicate key found
         }
 
         return root; // Return root of the modified subtree
     }
 
-    Node* deleteNode(Node* root, string key) {
-        Node* parent = nullptr;
-        Node* current = root;
-
-        // Find the node to delete and keep track of its parent
-        while (current != nullptr && current->key != key) {
-            parent = current;
-            if (key < current->key) {
-                current = current->left;
-            } else {
-                current = current->right;
-            }
+    Node* getSuccessor(Node* node)
+    {
+        Node* current = node->right;
+        while (current != nullptr && current->left != nullptr)
+        {
+            current = current->left;
         }
+        return current;
+    }
 
-        if (current == nullptr) {
+    Node* deleteNode(Node* root, string key)
+    {
+        if (root == nullptr)
+        {
             cout << "Node with key " << key << " not found!" << endl;
-            return root;  // Node not found, return the root unchanged
+            return root;
         }
 
-        // Case 1: Node has no children (leaf node)
-        if (current->left == nullptr && current->right == nullptr) {
-            if (parent == nullptr) {
-                // If root is the node to be deleted
-                delete current;
+        if (key < root->key)
+        {
+            root->left = deleteNode(root->left, key);
+        }
+        else if (key > root->key)
+        {
+            root->right = deleteNode(root->right, key);
+        }
+        else
+        {
+            // Case 1: Node has no children
+            if (root->left == nullptr && root->right == nullptr)
+            {
+                delete root;
                 return nullptr;
-            } else if (parent->left == current) {
-                parent->left = nullptr;
-            } else {
-                parent->right = nullptr;
             }
-            delete current;
-        }
-        // Case 2: Node has one child
-        else if (current->left == nullptr || current->right == nullptr) {
-           // If the node has one child, replace it with its only child
-            if (current->left == nullptr) {
-                // If there's no left child, the right child replaces it
-                if (parent == nullptr) {
-                    // If the node to be deleted is the root
-                    root = current->right;
-                } else if (parent->left == current) {
-                    parent->left = current->right;
-                } else {
-                    parent->right = current->right;
-                }
-            } else if (current->right == nullptr) {
-                // If there's no right child, the left child replaces it
-                if (parent == nullptr) {
-                    // If the node to be deleted is the root
-                    root = current->left;
-                } else if (parent->left == current) {
-                    parent->left = current->left;
-                } else {
-                    parent->right = current->left;
-                }
+            // Case 2: Node has one child
+            else if (root->left == nullptr)
+            {
+                Node* temp = root->right;
+                delete root;
+                return temp;
             }
+            else if (root->right == nullptr)
+            {
+                Node* temp = root->left;
+                delete root;
+                return temp;
+            }
+            // Case 3: Node has two children
+            Node* successor = getSuccessor(root);
+            root->key = successor->key;
+            root->value = successor->value;
+            root->right = deleteNode(root->right, successor->key);
         }
-    
+
         return root;
     }
 
     Node* search(Node* root, string key)
     {
-        while (root != nullptr) {
+        while (root != nullptr)
+        {
             // If key matches the root node, return it
-            if (root->key == key) {
+            if (root->key == key)
+            {
                 return root;
             }
             // Move left or right based on key comparison
-            if (key < root->key) {
+            if (key < root->key)
+            {
                 root = root->left;
-            } else {
+            }
+            else
+            {
                 root = root->right;
             }
         }
@@ -142,8 +147,8 @@ public:
         if (root != nullptr)
         {
             cout << root->key << ": " << root->value << endl; // Visit the root node first
-            preorder(root->left);  // Traverse the left subtree
-            preorder(root->right); // Traverse the right subtree
+            preorder(root->left);                             // Traverse the left subtree
+            preorder(root->right);                            // Traverse the right subtree
         }
     }
 
@@ -157,17 +162,46 @@ public:
         }
     }
 
-    void levelOrderTraversal(Node* root) {
-        if (!root) return;
+    void levelOrderTraversal(Node* root)
+    {
+        if (!root)
+            return;
         queue<Node*> q;
         q.push(root);
-        while (!q.empty()) {
+        while (!q.empty())
+        {
             Node* curr = q.front();
             q.pop();
             cout << curr->key << " : " << curr->value << endl;
-            if (curr->left) q.push(curr->left);
-            if (curr->right) q.push(curr->right);
+            if (curr->left)
+                q.push(curr->left);
+            if (curr->right)
+                q.push(curr->right);
         }
+    }
+
+    Node* mirror(Node* root)
+    {
+        if (root == nullptr)
+            return nullptr;
+        Node* mirrored = new Node(root->key, root->value);
+        mirrored->left = mirror(root->right);
+        mirrored->right = mirror(root->left);
+        return mirrored;
+    }
+
+    void mirrorTree()
+    {
+        root = mirror(root);
+    }
+
+    void copytree(Node* root, tree& copyTree)
+    {
+        if (root == nullptr)
+            return;
+        copyTree.insert(root->key, root->value);
+        copytree(root->left, copyTree);
+        copytree(root->right, copyTree);
     }
 
     // Utility function to initiate insertion and inorder traversal
@@ -184,9 +218,12 @@ public:
     void searchnode(string key)
     {
         Node* found = search(root, key);
-        if (found) {
+        if (found)
+        {
             cout << "Found node: " << found->key << " : " << found->value << endl;
-        } else {
+        }
+        else
+        {
             cout << "Node with key " << key << " not found!" << endl;
         }
     }
@@ -211,15 +248,6 @@ public:
         levelOrderTraversal(root);
     }
 
-    void copytree(Node* root, tree& copyTree)
-    {
-        if (root == nullptr) return;
-        copyTree.insert(root->key, root->value);
-        copytree(root->left, copyTree);
-        copytree(root->right, copyTree);
-    }
-
-    // Utility function to initiate copying
     void copytree(tree& copyTree)
     {
         copytree(root, copyTree);
@@ -229,21 +257,37 @@ public:
 int main()
 {
     tree t;
-    t.insert("a", "xyz");
-    t.insert("b", "xyz");
-    t.insert("c", "xyz");
     t.insert("d", "xyz");
+    t.insert("b", "xyz");
+    t.insert("a", "xyz");
+    t.insert("c", "xyz");
     t.insert("e", "xyz");
 
+    cout << "Inorder Traversal:" << endl;
     t.displayInorder();
+    cout << "\nPreorder Traversal:" << endl;
     t.displayPreorder();
+    cout << "\nPostorder Traversal:" << endl;
     t.displayPostorder();
+    cout << "\nLevel Order Traversal:" << endl;
     t.displayLevelOrder();
 
     t.searchnode("c");
     t.searchnode("f");
 
+    cout << "\nDeleting node with key 'c'..." << endl;
     t.deleteNode("c");
+    t.displayInorder();
+
+    cout << "\nCreating a copy of the dictionary..." << endl;
+    tree copyTree;
+    t.copytree(copyTree);
+    cout << "Copied dictionary (Inorder):" << endl;
+    copyTree.displayInorder();
+
+    cout << "\nCreating mirror image of the dictionary..." << endl;
+    t.mirrorTree();
+    cout << "Mirrored dictionary (Inorder):" << endl;
     t.displayInorder();
 
     return 0;
